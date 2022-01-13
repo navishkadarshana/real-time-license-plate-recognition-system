@@ -10,6 +10,7 @@ import boto3
 import base64
 import PIL
 from datetime import datetime
+import string
 
 application = Flask(__name__)
 cors = CORS(application)
@@ -87,22 +88,22 @@ while True:
             carNumberPlate = img[y:y + h, x:x + w]
     cv2.imshow("Result", img)
     if cv2.waitKey(1) & 0xFF == ord('s'):
-        text = pytesseract.image_to_string(carNumberPlate)
-        carNumberPlateText = text.translate({ord(i): None for i in '[-|/+\\s^%@<>!#*.,~$]'}).strip()
-        print(carNumberPlateText is None)
+        text = pytesseract.image_to_string(carNumberPlate).translate({ord(c): None for c in string.whitespace})
+        carNumberPlateText = ''.join(e for e in text if e.isalnum())
+        print(carNumberPlateText)
         if carNumberPlateText != "" and carNumberPlateText is not None:
             image_bytes = cv2.imencode('.jpg', carNumberPlate)[1].tobytes()
             s3.put_object(Bucket="ml-car-number-plate-detection", Key=carNumberPlateText + ".jpg", Body=image_bytes)
             vehicle = Vehicle(
-                vehicleNumberPlateUrl="test",
+                vehicleNumberPlateUrl="https://ml-car-number-plate-detection.s3.ap-southeast-1.amazonaws.com/"+carNumberPlateText+".jpg",
                 vehicleNo=carNumberPlateText,
                 parkDateTime=datetime.now(),
                 exitDateTime=None,
                 status="PARKED"
             )
             print(vehicle)
-            cv2.waitKey(500)
             db.session.add(vehicle)
             db.session.commit()
+            cv2.waitKey(500)
         else:
             cv2.imshow("ROI", carNumberPlate)
