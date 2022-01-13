@@ -1,19 +1,17 @@
 import pytesseract
 import cv2
-import easyocr
-from PIL import Image
 from dataclasses import dataclass
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
 import boto3
-import base64
-import PIL
 from datetime import datetime, timedelta
 import string
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from functools import wraps
+import imutils
+import numpy as np
 
 application = Flask(__name__)
 cors = CORS(application)
@@ -25,7 +23,6 @@ application.config['CORS_HEADERS'] = 'Content-Type'
 application.config['SECRET_KEY'] = 'my_secret_Ml'
 
 plateCascade = cv2.CascadeClassifier("comp/number_plate.xml")
-minArea = 500
 
 s3 = boto3.client('s3', region_name='ap-southeast-1')
 
@@ -70,13 +67,6 @@ class User(db.Model):
 db.create_all()
 db.session.commit()
 
-frameWidth = 640
-franeHeight = 480
-cap = cv2.VideoCapture(0)
-cap.set(3, frameWidth)
-cap.set(4, franeHeight)
-cap.set(10, 150)
-
 
 def token_required(f):
     @wraps(f)
@@ -108,7 +98,14 @@ def token_required(f):
 @application.route('/vehicle/add', methods=['POST'])
 @token_required
 def addVehicle(current_user):
-    print(current_user)
+    frameWidth = 640
+    franeHeight = 480
+    cap = cv2.VideoCapture(0)
+    cap.set(3, frameWidth)
+    cap.set(4, franeHeight)
+    cap.set(10, 150)
+    minArea = 500
+
     while True:
         success, img = cap.read()
         imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -138,17 +135,15 @@ def addVehicle(current_user):
                 print(vehicle)
                 db.session.add(vehicle)
                 db.session.commit()
-                cv2.imshow("Detected Number Plate --> " + carNumberPlateText, carNumberPlate)
-                cv2.waitKey(1)
+                cv2.destroyAllWindows()
                 return make_response(jsonify({
                     "success": "true",
                     "msg": "Vehicle successfully added!",
                     "status": "200"
                 }), 200)
+
             else:
-                brokImage = cv2.imread("saved-images/brockeImage.jpg")
-                cv2.imshow("The characters in this image unrecognizable", brokImage)
-                cv2.waitKey(1)
+                cv2.destroyAllWindows()
                 return make_response(jsonify({
                     "success": "false",
                     "msg": "The characters in this image Unrecognizable. Please try again",
@@ -156,7 +151,8 @@ def addVehicle(current_user):
                 }), 200)
 
 
-@application.route('/signup', methods=['POST'])
+@application.route('/user/create', methods=['POST'])
+@token_required
 def addUser():
     try:
         data = request.form
@@ -221,6 +217,64 @@ def login():
         403,
         {'WWW-Authenticate': 'Basic realm ="Wrong Password !!"'}
     )
+
+
+@application.route("/vehicle/addImage", methods=['POST'])
+@cross_origin()
+@token_required
+def imageToText(current_user):
+    file = request.files['file']
+
+    img = cv2.imdecode(np.fromstring(request.files['file'].read(), np.uint8), cv2.IMREAD_UNCHANGED)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    bfilter = cv2.bilateralFilter(gray, 11, 17, 17)  # Noise reduction
+    edged = cv2.Canny(bfilter, 30, 200)  # Edge detection
+    keypoints = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours = imutils.grab_contours(keypoints)
+    contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
+    location = None
+    for contour in contours:
+        approx = cv2.approxPolyDP(contour, 10, True)
+        if len(approx) == 4:
+            location = approx
+            break
+
+    mask = np.zeros(gray.shape, np.uint8)
+    new_image = cv2.drawContours(mask, [location], 0, 255, -1)
+    new_image = cv2.bitwise_and(img, img, mask=mask)
+    (x, y) = np.where(mask == 255)
+    (x1, y1) = (np.min(x), np.min(y))
+    (x2, y2) = (np.max(x), np.max(y))
+    cropped_image = gray[x1:x2 + 1, y1:y2 + 1]
+    text = pytesseract.image_to_string(cropped_image).translate({ord(c): None for c in string.whitespace})
+    carNumberPlateText = ''.join(e for e in text if e.isalnum())
+    print(carNumberPlateText)
+    if carNumberPlateText != "" and carNumberPlateText is not None:
+        image_bytes = cv2.imencode('.jpg', cropped_image)[1].tobytes()
+        s3.put_object(Bucket="navishka-dev-bucket", Key=carNumberPlateText + ".jpg", Body=image_bytes)
+        vehicle = Vehicle(
+            vehicleNumberPlateUrl="https://dzb0qruiu15wc.cloudfront.net/" + carNumberPlateText + ".jpg",
+            vehicleNo=carNumberPlateText,
+            parkDateTime=datetime.now(),
+            exitDateTime=None,
+            status="PARKED"
+        )
+        print(vehicle)
+        db.session.add(vehicle)
+        db.session.commit()
+
+        return make_response(jsonify({
+            "success": "true",
+            "msg": "Vehicle successfully added!",
+            "status": "200"
+        }), 200)
+
+    else:
+        return make_response(jsonify({
+            "success": "false",
+            "msg": "The characters in this image Unrecognizable. Please try again",
+            "status": "200"
+        }), 200)
 
 
 @application.route("/")
