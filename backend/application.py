@@ -9,6 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 import boto3
 import base64
 import PIL
+from datetime import datetime
 
 application = Flask(__name__)
 cors = CORS(application)
@@ -29,17 +30,26 @@ class Vehicle(db.Model):
     id: int
     vehicleNumberPlateUrl: str
     vehicleNo: str
+    parkDateTime: str
+    exitDateTime: str
+    status: str
 
     id = db.Column(db.Integer, primary_key=True)
-    vehicleNumberPlateUrl = db.Column(db.String(300), unique=False, nullable=False)
+    vehicleNumberPlateUrl = db.Column(db.String(500), unique=False, nullable=False)
     vehicleNo = db.Column(db.String(120), unique=False, nullable=False)
+    parkDateTime = db.Column(db.String(200), unique=False, nullable=True)
+    exitDateTime = db.Column(db.String(200), unique=False, nullable=True)
+    status = db.Column(db.String(50), unique=False, nullable=False)
 
-    def __init__(self, vehicleNumberPlateUrl, vehicleNo):
-        self.name = vehicleNumberPlateUrl
+    def __init__(self, vehicleNumberPlateUrl, vehicleNo, parkDateTime, exitDateTime, status):
+        self.vehicleNumberPlateUrl = vehicleNumberPlateUrl
         self.vehicleNo = vehicleNo
+        self.parkDateTime = parkDateTime
+        self.exitDateTime = exitDateTime
+        self.status = status
 
     def __repr__(self):
-        return f"['name'=>{self.name}, 'vehicleNumberPlateUrl'=>{self.vehicleNumberPlateUrl}, 'vehicleNo'=>{self.vehicleNo}] "
+        return f"['vehicleNumberPlateUrl'=>{self.vehicleNumberPlateUrl}, 'vehicleNo'=>{self.vehicleNo}, 'parkDateTime'=>{self.parkDateTime}, 'exitDateTime'=>{self.exitDateTime}, 'status'=>{self.status}] "
 
 
 class User(db.Model):
@@ -78,14 +88,21 @@ while True:
     cv2.imshow("Result", img)
     if cv2.waitKey(1) & 0xFF == ord('s'):
         text = pytesseract.image_to_string(carNumberPlate)
-        carNumberPlateText = text.translate({ord(i): None for i in '[-|/+\s^%@<>!#*.,~$]'}).strip()
-        print(carNumberPlateText)
-        print(carNumberPlateText == "")
+        carNumberPlateText = text.translate({ord(i): None for i in '[-|/+\\s^%@<>!#*.,~$]'}).strip()
         print(carNumberPlateText is None)
         if carNumberPlateText != "" and carNumberPlateText is not None:
             image_bytes = cv2.imencode('.jpg', carNumberPlate)[1].tobytes()
             s3.put_object(Bucket="ml-car-number-plate-detection", Key=carNumberPlateText + ".jpg", Body=image_bytes)
-            uploadImg = "https://ml-car-number-plate-detection.s3.ap-southeast-1.amazonaws.com/" + carNumberPlateText + ".jpg"
+            vehicle = Vehicle(
+                vehicleNumberPlateUrl="test",
+                vehicleNo=carNumberPlateText,
+                parkDateTime=datetime.now(),
+                exitDateTime=None,
+                status="PARKED"
+            )
+            print(vehicle)
             cv2.waitKey(500)
+            db.session.add(vehicle)
+            db.session.commit()
         else:
-            raise Exception("cannot identified car number plate!")
+            cv2.imshow("ROI", carNumberPlate)
