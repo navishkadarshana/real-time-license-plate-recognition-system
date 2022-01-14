@@ -13,10 +13,12 @@ from functools import wraps
 import imutils
 import numpy as np
 
+SERVER_DB_URI = "mysql+pymysql://root:tqKVrS5JEQp9px7@aa1onuogkw2qjqc.chjlhjez8sqp.ap-southeast-1.rds.amazonaws.com:3306/ebdb"
+LOCAL_DB_URI = "mysql+pymysql://root:root@localhost:3306/car_park_system"
 application = Flask(__name__)
 cors = CORS(application)
 application.config[
-    'SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:root@localhost:3306/car_park_system"
+    'SQLALCHEMY_DATABASE_URI'] = SERVER_DB_URI
 db = SQLAlchemy(application)
 application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 application.config['CORS_HEADERS'] = 'Content-Type'
