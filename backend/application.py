@@ -95,6 +95,27 @@ def token_required(f):
     return decorated
 
 
+@application.route("/")
+def hello_world():
+    return "<p>Welcome Navishka!</p>"
+
+
+@application.route("/dashboard", methods=['GET'])
+@cross_origin()
+def dashboard():
+    try:
+        vehicle = Vehicle.query.filter_by().count()
+        return make_response(jsonify({
+            "success": "true",
+            "data": {
+                "noOfVehicles": vehicle
+            },
+            "status": "200"
+        }), 200)
+    except:
+        return errorResponse()
+
+
 @application.route('/vehicle/add', methods=['POST'])
 @token_required
 def addVehicle(current_user):
@@ -152,6 +173,7 @@ def addVehicle(current_user):
 
 
 @application.route('/user/create', methods=['POST'])
+@cross_origin()
 @token_required
 def addUser():
     try:
@@ -182,6 +204,7 @@ def errorResponse():
 
 
 @application.route('/login', methods=['POST'])
+@cross_origin()
 def login():
     auth = request.form
 
@@ -217,6 +240,20 @@ def login():
         403,
         {'WWW-Authenticate': 'Basic realm ="Wrong Password !!"'}
     )
+
+
+@application.route("/vehicle/get-all", methods=['GET'])
+@cross_origin()
+def getAllVehicles():
+    try:
+        allCar = Vehicle.query.all()
+        return make_response(jsonify({
+            "success": True,
+            "status": "200",
+            "data": allCar
+        }), 200)
+    except:
+        return errorResponse()
 
 
 @application.route("/vehicle/addImage", methods=['POST'])
@@ -275,8 +312,3 @@ def imageToText(current_user):
             "msg": "The characters in this image Unrecognizable. Please try again",
             "status": "200"
         }), 200)
-
-
-@application.route("/")
-def hello_world():
-    return "<p>Welcome Navishka!</p>"
