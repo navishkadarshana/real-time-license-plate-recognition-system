@@ -342,3 +342,7 @@ def getAllUser(user):
         }), 200)
     except:
         return errorResponse()
+
+
+if __name__ == '__main__':
+    application.run(debug=True)
