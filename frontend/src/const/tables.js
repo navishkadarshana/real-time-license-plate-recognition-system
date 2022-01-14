@@ -1,9 +1,9 @@
 
 export const vehicleTableColumn = [
-    {Header: "Owner Name", accessor: "ownerName", align: "left"},
+    {Header: "id", accessor: "id", align: "left"},
     {Header: "Vehicle No", accessor: "vehicleNo", align: "left"},
-    {Header: "Model", accessor: "model", align: "left"},
-    {Header: "Colour", accessor: "colour", align: "left"},
-    {Header: "type", accessor: "type", align: "left"},
-    {Header: "Action", accessor: "action", align: "left"},
+    {Header: "Image", accessor: "Image", align: "left"},
+    {Header: "status", accessor: "status", align: "left"},
+    {Header: "parkDateTime", accessor: "parkDateTime", align: "left"},
+    {Header: "exitDateTime", accessor: "exitDateTime", align: "left"},
 ]

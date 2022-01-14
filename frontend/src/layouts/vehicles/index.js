@@ -56,15 +56,12 @@ class Vehicles extends Component {
         let row = []
         this.state.vehicles.map(v => {
             row.push({
-                ownerName: v.id,
+                id: v.id,
                 vehicleNo: v.vehicleNo,
                 status: v.status,
-                Image: v.vehicleNumberPlateUrl,
-                type: v.type,
-                action: (<div style={{display: 'flex'}}>
-                    <UpdateVehicle loadAll={this.getAllVehicles} data={v}/>
-                    <DeleteVehicle loadAll={this.getAllVehicles} id={v}/>
-                </div>),
+                Image:  (<img src={v.vehicleNumberPlateUrl} style={{width: '100px'}}></img>),
+                parkDateTime: v.parkDateTime,
+                exitDateTime:v.exitDateTime,
             })
         })
 
