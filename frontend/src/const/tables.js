@@ -7,3 +7,9 @@ export const vehicleTableColumn = [
     {Header: "parkDateTime", accessor: "parkDateTime", align: "left"},
     {Header: "exitDateTime", accessor: "exitDateTime", align: "left"},
 ]
+
+export const userTableColumn = [
+    {Header: "id", accessor: "id", align: "left"},
+    {Header: "name", accessor: "name", align: "left"},
+    {Header: "userName", accessor: "userName", align: "left"},
+]

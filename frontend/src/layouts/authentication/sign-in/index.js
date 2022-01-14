@@ -82,6 +82,7 @@ function Basic() {
                     showConfirmButton: false,
                     timer: 1500
                 })
+                window.location.href = "/dashboard"
             })
             .catch(function (error) {
                 Swal.fire({

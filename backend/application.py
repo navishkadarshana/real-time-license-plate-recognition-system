@@ -12,7 +12,7 @@ import jwt
 from functools import wraps
 import imutils
 import numpy as np
-
+from json import JSONEncoder
 
 LOCAL_DB_URI = "mysql+pymysql://root:root@localhost:3306/car_park_system"
 application = Flask(__name__)
@@ -53,17 +53,28 @@ class Vehicle(db.Model):
         self.status = status
 
     def __repr__(self):
-        return f"['vehicleNumberPlateUrl'=>{self.vehicleNumberPlateUrl}, 'vehicleNo'=>{self.vehicleNo}, 'parkDateTime'=>{self.parkDateTime}, 'exitDateTime'=>{self.exitDateTime}, 'status'=>{self.status}] "
+        return f"['vehicleNumberPlateUrl'=>{self.vehicleNumberPlateUrl}, 'vehicleNo'=>{self.vehicleNo}, 'parkDateTime'=>{self.parkDateTime}, 'exitDateTime'=>{self.exitDateTime}, 'status'=>{self.status}]"
 
 
+@dataclass
 class User(db.Model):
+    id: int
+    name: str
+    userName: str
+    password: str
+
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
     userName = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(200), unique=False, nullable=False)
 
-    def __init__(self, userName, password):
+    def __init__(self, name, userName, password):
+        self.name = name
         self.userName = userName
         self.password = password
+
+    def __repr__(self):
+        return f"['name'=>{self.name}, 'userName'=>{self.userName}, 'password'=>{self.password}] "
 
 
 db.create_all()
@@ -177,11 +188,12 @@ def addVehicle(current_user):
 @application.route('/user/create', methods=['POST'])
 @cross_origin()
 @token_required
-def addUser():
+def addUser(user):
     try:
         data = request.form
         user = User(
-            userName=data.get('userName'),
+            userName=data.get('username'),
+            name=data.get('name'),
             password=generate_password_hash(data.get('password')),
         )
         print(user)
@@ -190,7 +202,7 @@ def addUser():
 
         return make_response(jsonify({
             "success": "true",
-            "msg": "Vehicle update successfully!",
+            "msg": "User added successfully!",
             "status": "200"
         }), 200)
     except:
@@ -213,7 +225,7 @@ def login():
         return make_response(
             'Could not verify',
             401,
-            {'WWW-Authenticate': 'Basic realm ="Login required !!"'}
+            {'www-authenticate': 'Basic realm ="Login required !!"'}
         )
 
     user = User.query.filter_by(userName=auth.get('username')).first()
@@ -245,7 +257,8 @@ def login():
 
 @application.route("/vehicle/get-all", methods=['GET'])
 @cross_origin()
-def getAllVehicles():
+@token_required
+def getAllVehicles(user):
     try:
         allCar = Vehicle.query.all()
         return make_response(jsonify({
@@ -313,3 +326,19 @@ def imageToText(current_user):
             "msg": "The characters in this image Unrecognizable. Please try again",
             "status": "200"
         }), 200)
+
+
+@application.route("/user/get-user", methods=['GET'])
+@cross_origin()
+@token_required
+def getAllUser(user):
+    try:
+        allUsers = User.query.all()
+        print(allUsers)
+        return make_response(jsonify({
+            "success": True,
+            "status": "200",
+            "data": allUsers
+        }), 200)
+    except:
+        return errorResponse()

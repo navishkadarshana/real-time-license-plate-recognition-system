@@ -30,7 +30,9 @@ export default class AddVehicle extends Component {
         open: false,
         src: null,
         isCropped: false,
-        image:null
+        name:null,
+        username:null,
+        password :null
     }
 
     handleClickOpen = (state) => {
@@ -41,6 +43,16 @@ export default class AddVehicle extends Component {
             croppedImageUrl: state === false ? null : this.state.croppedImageUrl,
         })
     };
+
+
+    onInputHandler = (e) => {
+        let val = e.target.value
+
+        this.setState({
+            [e.target.name]: val
+        })
+    }
+
 
     errorMsg = (msg) => {
         const Toast = Swal.mixin({
@@ -69,26 +81,23 @@ export default class AddVehicle extends Component {
     };
 
 
-     uploadImage = () => {
-            this.setState({open: false})
-            let data = new FormData()
-            if(this.state.image === null){
-                this.setState({open: false})
-                this.errorMsg("Please Select Image!")
-            }
-            data.append("file", this.state.image);
-            let config = {
-                method: 'post',
-                url: 'http://127.0.0.1:5000/vehicle/addImage',
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    'x-access-token': cookies.get(ACCESS_TOKEN)
-                },
-                data: data
-            }
+     saveUser = () => {
+         this.setState({open: false})
+         let data = new FormData();
+         data.append('name', this.state.name);
+         data.append('username', this.state.username);
+         data.append('password', this.state.password);
 
+         let config = {
+             method: 'post',
+             url: 'http://127.0.0.1:5000/user/create',
+             headers: {
+                 'x-access-token': cookies.get(ACCESS_TOKEN)
+             },
+             data : data
+         };
          axios(config)
-             .then(function (response) {
+             .then((response) => {
                  if(response.data.success){
                      Swal.fire({
                          position: 'top-end',
@@ -97,7 +106,6 @@ export default class AddVehicle extends Component {
                          showConfirmButton: false,
                          timer: 1500
                      })
-                     this.props.loadAll()
                  }else {
                      Swal.fire({
                          position: 'top-end',
@@ -108,7 +116,7 @@ export default class AddVehicle extends Component {
                      })
                  }
              })
-             .catch(function (error) {
+             .catch((error) => {
                  this.errorMsg(error)
              });
      }
@@ -128,10 +136,42 @@ export default class AddVehicle extends Component {
                             <Grid container spacing={2}>
                                 <>
                                     <Grid item md={6}>
-                                        <Dropzone
-                                            maxFiles={1}
-                                            onChangeStatus={this.handlePickImage}
-                                            accept="image/*"
+                                        <TextField
+                                            autoFocus
+                                            margin="dense"
+                                            id="name"
+                                            label="name"
+                                            type="name"
+                                            fullWidth
+                                            variant="standard"
+                                            onChange={this.onInputHandler}
+                                            name={'name'}
+                                            value={this.state.name}
+                                        />
+                                        <TextField
+                                            autoFocus
+                                            margin="dense"
+                                            id="username"
+                                            label="username"
+                                            type="username"
+                                            fullWidth
+                                            variant="standard"
+                                            onChange={this.onInputHandler}
+                                            name={'username'}
+                                            value={this.state.username}
+                                        />
+
+                                        <TextField
+                                            autoFocus
+                                            margin="dense"
+                                            id="password"
+                                            label="Password"
+                                            type="password"
+                                            fullWidth
+                                            variant="standard"
+                                            onChange={this.onInputHandler}
+                                            name={'password'}
+                                            value={this.state.password}
                                         />
                                     </Grid>
                                 </>
@@ -139,7 +179,7 @@ export default class AddVehicle extends Component {
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={() => this.handleClickOpen(false)}>Cancel</Button>
-                            <Button onClick={this.uploadImage}>Save</Button>
+                            <Button onClick={this.saveUser}>Save</Button>
                         </DialogActions>
                 </Dialog>
             </div>

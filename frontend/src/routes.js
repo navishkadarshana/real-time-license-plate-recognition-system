@@ -7,7 +7,9 @@ import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import Vehicles from "layouts/vehicles";
+import User from "layouts/user";
 import Icon from "@mui/material/Icon";
+
 
 const routes = [
     {
@@ -26,6 +28,16 @@ const routes = [
         route: "/vehicles",
         component: <Vehicles/>,
     },
+
+    {
+        type: "collapse",
+        name: "user",
+        key: "user",
+        icon: <Icon fontSize="small">person</Icon>,
+        route: "/user",
+        component: <User/>,
+    },
+
     {
         type: "collapse",
         name: "Logout",
