@@ -12,4 +12,3 @@ Flask-Cors
 pymysql
 dataclasses
 datetime
-functools
