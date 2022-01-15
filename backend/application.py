@@ -158,9 +158,9 @@ def addVehicle(current_user):
             print(carNumberPlateText)
             if carNumberPlateText != "" and carNumberPlateText is not None:
                 image_bytes = cv2.imencode('.jpg', carNumberPlate)[1].tobytes()
-                s3.put_object(Bucket="ml-car-number-plate-detection", Key=carNumberPlateText + ".jpg", Body=image_bytes)
+                s3.put_object(Bucket="navishka-dev-bucket", Key=carNumberPlateText + ".jpg", Body=image_bytes)
                 vehicle = Vehicle(
-                    vehicleNumberPlateUrl="https://ml-car-number-plate-detection.s3.ap-southeast-1.amazonaws.com/" + carNumberPlateText + ".jpg",
+                    vehicleNumberPlateUrl="https://dzb0qruiu15wc.cloudfront.net/" + carNumberPlateText + ".jpg",
                     vehicleNo=carNumberPlateText,
                     parkDateTime=datetime.now(),
                     exitDateTime=None,
