@@ -88,8 +88,8 @@ export default class AddVehicle extends Component {
             }
 
          axios(config)
-             .then(function (response) {
-                 if(response.data.success){
+             .then((response) => {
+                 if(response.data.success==="true"){
                      Swal.fire({
                          position: 'top-end',
                          icon: 'success',
@@ -97,7 +97,6 @@ export default class AddVehicle extends Component {
                          showConfirmButton: false,
                          timer: 1500
                      })
-                     this.props.loadAll()
                  }else {
                      Swal.fire({
                          position: 'top-end',
@@ -108,7 +107,7 @@ export default class AddVehicle extends Component {
                      })
                  }
              })
-             .catch(function (error) {
+             .catch((error) =>{
                  this.errorMsg(error)
              });
      }
