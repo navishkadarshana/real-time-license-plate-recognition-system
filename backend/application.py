@@ -12,7 +12,11 @@ import jwt
 from functools import wraps
 import imutils
 import numpy as np
-from json import JSONEncoder
+
+# @author Navishka Darshana
+# @project ml-car-number-plate-detection-backend
+# @CreatedBy PyCharm
+# version 3.9
 
 LOCAL_DB_URI = "mysql+pymysql://root:root@localhost:3306/car_park_system"
 application = Flask(__name__)
@@ -25,8 +29,7 @@ application.config['CORS_HEADERS'] = 'Content-Type'
 application.config['SECRET_KEY'] = 'my_secret_Ml'
 
 plateCascade = cv2.CascadeClassifier("comp/number_plate.xml")
-
-s3 = boto3.client('s3', region_name='ap-southeast-1')
+s3 = boto3.client('s3', region_name='ap-southeast-1')  # config s3 bucket
 
 
 @dataclass
