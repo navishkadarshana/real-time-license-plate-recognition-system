@@ -151,8 +151,8 @@ def addVehicle(current_user):
         for (x, y, w, h) in numberPlates:
             area = w * h
             if area > minArea:
-                cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
-                cv2.putText(img, "Number Plate Identified", (x, y - 5), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 2)
+                cv2.rectangle(img, (x, y), (x + w, y + h), (124, 252, 0), 2)
+                cv2.putText(img, "DETECTED", (x, y - 5), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
                 carNumberPlate = img[y:y + h, x:x + w]
         cv2.imshow("Result", img)
         if cv2.waitKey(1) & 0xFF == ord('s'):

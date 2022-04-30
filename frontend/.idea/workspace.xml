@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0d0e06bb-e6d1-4686-a7a9-e600c3eb15a9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../.idea/ml-car-number-plate-detection-backend.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/frontend.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="0d0e06bb-e6d1-4686-a7a9-e600c3eb15a9" name="Changes" comment="update add car image logic">
       <change beforePath="$PROJECT_DIR$/../backend/application.py" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/application.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/const/strings.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/const/strings.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/layouts/vehicles/addNew.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/layouts/vehicles/addNew.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,8 +51,16 @@
       <workItem from="1642159364777" duration="86000" />
       <workItem from="1642160660212" duration="62000" />
       <workItem from="1651255439220" duration="2922000" />
-      <workItem from="1651304831342" duration="2707000" />
+      <workItem from="1651304831342" duration="5897000" />
     </task>
+    <task id="LOCAL-00001" summary="update add car image logic">
+      <created>1651307562533</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1651307562533</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -78,5 +79,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="update add car image logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="update add car image logic" />
   </component>
 </project>
