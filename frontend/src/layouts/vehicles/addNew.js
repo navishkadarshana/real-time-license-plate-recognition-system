@@ -22,6 +22,7 @@ import {Rings} from "react-loader-spinner/dist/loader/Rings";
 import Dropzone from 'react-dropzone-uploader'
 import Swal from "sweetalert2";
 import cookies from "js-cookie";
+import {endpoint} from "../../services/apiconfig";
 
 const ACCESS_TOKEN = "2d2c094";
 export default class AddVehicle extends Component {
@@ -40,6 +41,30 @@ export default class AddVehicle extends Component {
             src: state === false ? null : this.state.src,
             croppedImageUrl: state === false ? null : this.state.croppedImageUrl,
         })
+    };
+
+
+    openCamera = async () => {
+
+            let config = {
+                method: 'post',
+                url: `${endpoint.host}/vehicle/add`,
+                headers: {
+                    'x-access-token': cookies.get(ACCESS_TOKEN)
+                }
+            }
+
+        axios(config)
+            .then( (response) => {
+                if (response.data.success) {
+                    this.setState({
+                        vehicles: response.data.data
+                    })
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
     };
 
     errorMsg = (msg) => {
@@ -97,6 +122,7 @@ export default class AddVehicle extends Component {
                          showConfirmButton: false,
                          timer: 1500
                      })
+                     window.location.href = "/vehicles"
                  }else {
                      Swal.fire({
                          position: 'top-end',
@@ -116,9 +142,14 @@ export default class AddVehicle extends Component {
 
         return (
             <div>
-                <MDButton variant="gradient" color="dark" onClick={() => this.handleClickOpen(true)}>
+                <MDButton style={{right: '30px'}} variant="gradient" color="dark" onClick={() => this.handleClickOpen(true)}>
                     <Icon sx={{fontWeight: "bold"}}>add</Icon>
                     &nbsp;{strings.addNewVehicle}
+                </MDButton>
+
+                <MDButton variant="gradient" color="dark" onClick={this.openCamera}>
+                    <Icon sx={{fontWeight: "bold"}}>camera</Icon>
+                    &nbsp;{strings.openCamera}
                 </MDButton>
                 <Dialog open={this.state.open} onClose={() => this.handleClickOpen(false)} maxWidth={'sm'}
                         fullWidth={true}>

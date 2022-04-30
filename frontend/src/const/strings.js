@@ -10,6 +10,7 @@ export const strings = {
 
     // vehicle
     addNewVehicle: "Add New Vehicle",
+    openCamera: "Open Camera",
     updateVehicle: "Update Vehicle",
     vehicleNo: "Vehicle No",
     model: "Model",

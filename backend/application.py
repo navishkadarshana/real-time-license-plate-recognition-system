@@ -190,8 +190,7 @@ def addVehicle(current_user):
 
 @application.route('/user/create', methods=['POST'])
 @cross_origin()
-@token_required
-def addUser(user):
+def addUser():
     try:
         data = request.form
         user = User(
